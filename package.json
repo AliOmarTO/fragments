@@ -13,5 +13,8 @@
     },
     "keywords": [],
     "author": "Ali Omar",
-    "license": "UNLICENSED"
+    "license": "UNLICENSED",
+    "devDependencies": {
+        "prettier": "3.4.2"
+    }
 }
