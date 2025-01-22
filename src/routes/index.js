@@ -33,4 +33,6 @@ router.get('/', (req, res) => {
   });
 });
 
+const unneededVariable = 'This variable is never used';
+
 module.exports = router;
