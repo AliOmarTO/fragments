@@ -37,7 +37,7 @@ app.use('/', require('./routes'));
 
 // Add 404 middleware to handle any requests for resources that can't be found
 app.use((req, res) => {
-  res.status(404).json(createErrorResponse(404, 'not found'));
+  res.status(500).json(createErrorResponse(404, 'not found'));
 });
 
 // Add error-handling middleware to deal with anything else
@@ -55,6 +55,8 @@ app.use((err, req, res, next) => {
 
   res.status(status).json(createErrorResponse(status, message));
 });
+
+const unneededvar = 'this should be removed';
 
 // Export our `app` so we can access it in server.js
 module.exports = app;
