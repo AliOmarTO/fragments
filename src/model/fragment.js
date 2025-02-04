@@ -16,7 +16,25 @@ const {
 
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
-    // TODO
+    if (!ownerId) {
+      throw new Error('ownerId is required');
+    }
+    if (!type) {
+      throw new Error('type is required');
+    }
+    if (!Number.isInteger(size) || size < 0) {
+      throw new Error('size must be a non-negative number');
+    }
+    if (!Fragment.isSupportedType(type)) {
+      throw new Error(`unsupported type: ${type}`);
+    }
+
+    this.id = id || randomUUID();
+    this.ownerId = ownerId;
+    this.type = type;
+    this.size = size;
+    this.created = created || new Date().toISOString();
+    this.updated = updated || new Date().toISOString();
   }
 
   /**
@@ -26,7 +44,7 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    // TODO
+    return listFragments(ownerId, expand);
   }
 
   /**
@@ -38,6 +56,15 @@ class Fragment {
   static async byId(ownerId, id) {
     // TODO
     // TIP: make sure you properly re-create a full Fragment instance after getting from db.
+    const fragment = await readFragment(ownerId, id);
+    return new Fragment({
+      id: fragment.id,
+      ownerId: fragment.ownerId,
+      created: fragment.created,
+      updated: fragment.updated,
+      type: fragment.type,
+      size: fragment.size,
+    });
   }
 
   /**
@@ -47,7 +74,7 @@ class Fragment {
    * @returns Promise<void>
    */
   static delete(ownerId, id) {
-    // TODO
+    return deleteFragment(ownerId, id);
   }
 
   /**
@@ -55,7 +82,8 @@ class Fragment {
    * @returns Promise<void>
    */
   save() {
-    // TODO
+    this.updated = new Date().toISOString();
+    return writeFragment(this);
   }
 
   /**
@@ -63,7 +91,7 @@ class Fragment {
    * @returns Promise<Buffer>
    */
   getData() {
-    // TODO
+    return readFragmentData(this.ownerId, this.id);
   }
 
   /**
@@ -74,6 +102,13 @@ class Fragment {
   async setData(data) {
     // TODO
     // TIP: make sure you update the metadata whenever you change the data, so they match
+    if (!data) {
+      throw new Error('buffer is required');
+    }
+
+    this.size = data.length;
+    this.save();
+    return writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -91,7 +126,11 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    // TODO
+    if (this.type.startsWith('text/')) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -99,7 +138,11 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    // TODO
+    if (this.mimeType === 'text/plain') {
+      return ['text/plain'];
+    } else {
+      return [];
+    }
   }
 
   /**
@@ -108,7 +151,10 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // TODO
+    const validTypes = [`text/plain`, 'text/plain; charset=utf-8'];
+    // // extract only the type part of the Content-Type header
+    // const mimeType = value.split(';')[0].trim();
+    return validTypes.includes(value);
   }
 }
 
