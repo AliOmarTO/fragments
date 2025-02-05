@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../../src/app');
+const hash = require('../../src/hash');
 
 describe('POST /v1/fragments', () => {
   // If the request is missing the Authorization header, it should be forbidden
@@ -38,7 +39,7 @@ describe('POST /v1/fragments', () => {
     expect(res.body.fragment.updated).toBeDefined();
     expect(res.body.fragment.size).toBe(9);
     expect(res.body.fragment.type).toBe('text/plain');
-    expect(res.body.fragment.ownerId).toBe('user1@email.com');
+    expect(res.body.fragment.ownerId).toBe(hash('user1@email.com'));
   });
 
   test('response includes a location header with full url', async () => {
