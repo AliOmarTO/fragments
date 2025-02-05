@@ -30,6 +30,8 @@ const router = express.Router();
 router.get('/fragments', require('./get'));
 // Other routes (POST, DELETE, etc.) will go here later on...
 
+router.get('/fragments/:id', require('./getById'));
+
 router.post('/fragments', rawBody(), require('./post'));
 
 module.exports = router;
