@@ -151,10 +151,9 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    const validTypes = [`text/plain`, 'text/plain; charset=utf-8'];
-    // // extract only the type part of the Content-Type header
-    // const mimeType = value.split(';')[0].trim();
-    return validTypes.includes(value);
+    let obj = contentType.parse(value);
+    const validTypes = [`text/plain`];
+    return validTypes.includes(obj.type);
   }
 }
 
