@@ -2,7 +2,6 @@
 const logger = require('../../logger');
 const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
-const contentType = require('content-type');
 
 module.exports = async (req, res) => {
   logger.info('Retrieving fragment by id...');
