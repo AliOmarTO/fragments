@@ -10,8 +10,10 @@ const { Fragment } = require('../../model/fragment');
 module.exports = async (req, res) => {
   logger.info('Retrieving all fragments for the current user...');
   logger.debug(req.user, 'Authenticated user');
+
+  const { expand } = req.query;
   try {
-    const fragmentsReturned = await Fragment.byUser(req.user);
+    const fragmentsReturned = await Fragment.byUser(req.user, expand ? true : false);
     res.status(200).json(
       createSuccessResponse({
         fragments: fragmentsReturned,
