@@ -39,6 +39,17 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+  dockerfile-lint:
+    name: Dockerfile Lint
+    runs-on: ubuntu-latest
+    steps:
+        # https://github.com/marketplace/actions/hadolint-action
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          # Specify the Dockerfile to lint
+          dockerfile: Dockerfile
         
   unit-tests:
     name: Unit Tests
@@ -64,3 +75,14 @@ jobs:
         # 2. Use `install-ci-test` to do it in a single command, see https://docs.npmjs.com/cli/v8/commands/npm-install-ci-test
         # run: npm install-ci-test
         run: npm install-ci-test
+
+  dockerfile-lint:
+    name: Dockerfile Lint
+    runs-on: ubuntu-latest
+    steps:
+        # https://github.com/marketplace/actions/hadolint-action
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          # Specify the Dockerfile to lint
+          dockerfile: Dockerfile
