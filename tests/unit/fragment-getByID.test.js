@@ -2,6 +2,8 @@ const request = require('supertest');
 
 const app = require('../../src/app');
 
+let fragmentID;
+
 describe('GET /v1/fragments/:id ', () => {
   test('unauthenticated requests are denied', () =>
     request(app).get('/v1/fragments/1234').expect(401));
@@ -23,12 +25,20 @@ describe('GET /v1/fragments/:id ', () => {
     expect(resCreate.statusCode).toBe(201);
 
     //get location header
-    const fragmentID = resCreate.header.location.split('/').pop();
+    fragmentID = resCreate.header.location.split('/').pop();
 
     const resGet = await request(app)
       .get(`/v1/fragments/${fragmentID}`)
-      .auth('user1@email.com', 'password1');
-    expect(resGet.statusCode).toBe(200);
-    expect(resGet.body.toString()).toEqual('test data');
+      .auth('user1@email.com', 'password1')
+      .expect('Content-Type', 'text/plain; charset=utf-8')
+      .expect(200);
+  });
+
+  test('response includes correct Content-Type header', async () => {
+    const resGet = await request(app)
+      .get(`/v1/fragments/${fragmentID}`)
+      .auth('user1@email.com', 'password1')
+      .expect('Content-Type', 'text/plain; charset=utf-8')
+      .expect(200);
   });
 });

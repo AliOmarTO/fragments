@@ -57,6 +57,10 @@ class Fragment {
     // TODO
     // TIP: make sure you properly re-create a full Fragment instance after getting from db.
     const fragment = await readFragment(ownerId, id);
+    if (!fragment) {
+      throw new Error('Fragment not found');
+    }
+
     return new Fragment({
       id: fragment.id,
       ownerId: fragment.ownerId,
