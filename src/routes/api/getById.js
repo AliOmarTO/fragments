@@ -2,17 +2,26 @@
 const logger = require('../../logger');
 const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
+const MarkdownIt = require('markdown-it');
 
 module.exports = async (req, res) => {
   logger.info('Retrieving fragment by id...');
 
+  const md = new MarkdownIt();
+
   try {
+    const { id, ext } = req.params;
     // fetch the fragment by id
-    const fragment = await Fragment.byId(req.user, req.params.id);
+    const fragment = await Fragment.byId(req.user, id);
 
     // Fragment exists, get its data
     const fragmentBuffer = await fragment.getData();
     logger.debug(fragmentBuffer, 'Fragment exists for user');
+
+    // If it's Markdown and user requests `.html`, convert it
+    if (fragment.type === 'text/markdown' && ext === 'html') {
+      return res.type('text/html').send(md.render(fragmentBuffer.toString()));
+    }
 
     // Set the Content-Type header
     res.set('content-type', fragment.type);
