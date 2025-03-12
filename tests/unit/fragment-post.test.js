@@ -2,6 +2,14 @@ const request = require('supertest');
 const app = require('../../src/app');
 const hash = require('../../src/hash');
 
+const supportedTypes = [
+  { type: 'text/plain', data: 'Plain text data' },
+  { type: 'application/json', data: JSON.stringify({ key: 'value' }) },
+  { type: 'text/markdown', data: '# Markdown Header' },
+  { type: 'text/html', data: '<h1>HTML</h1>' },
+  { type: 'text/csv', data: 'name,age\nJohn,30\nJane,25' },
+];
+
 describe('POST /v1/fragments', () => {
   // If the request is missing the Authorization header, it should be forbidden
   test('unauthenticated requests are denied', () =>
@@ -25,6 +33,19 @@ describe('POST /v1/fragments', () => {
     expect(res.statusCode).toBe(201);
     expect(res.body.status).toBe('ok');
     expect(res.body.fragment).toBeDefined();
+  });
+
+  test.each(supportedTypes)('accepts supported content type: %s', async ({ type, data }) => {
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', type)
+      .send(Buffer.from(data));
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.status).toBe('ok');
+    expect(res.body.fragment).toBeDefined();
+    expect(res.body.fragment.type).toBe(type);
   });
 
   test('response includes all necessary properties', async () => {

@@ -156,7 +156,7 @@ class Fragment {
    */
   static isSupportedType(value) {
     let obj = contentType.parse(value);
-    const validTypes = [`text/plain`];
+    const validTypes = [`text/plain`, 'text/html', 'text/markdown', 'text/csv', 'application/json'];
     return validTypes.includes(obj.type);
   }
 }

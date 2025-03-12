@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     logger.debug(fragmentBuffer, 'Fragment exists for user');
 
     // Set the Content-Type header
-    res.set('content-type', 'text/plain');
+    res.set('content-type', fragment.type);
     res.send(new Buffer.from(fragmentBuffer));
   } catch (error) {
     if (error.message === 'Fragment not found') {

@@ -8,6 +8,7 @@ const { Fragment } = require('../../model/fragment');
  * The main entry-point for the v1 version of the fragments API.
  */
 const express = require('express');
+const logger = require('../../logger');
 
 // Support sending various Content-Types on the body up to 5M in size
 const rawBody = () =>
@@ -19,6 +20,7 @@ const rawBody = () =>
       // a Buffer (e.g., `Buffer.isBuffer(req.body) === true`). If not, `req.body`
       // will be equal to an empty Object `{}` and `Buffer.isBuffer(req.body) === false`
       const { type } = contentType.parse(req);
+      logger.debug(type);
       return Fragment.isSupportedType(type);
     },
   });
