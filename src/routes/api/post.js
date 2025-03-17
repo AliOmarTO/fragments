@@ -7,7 +7,7 @@ const contentType = require('content-type');
 module.exports = async (req, res) => {
   logger.info('Creating a new fragment');
   // check if API_URL is set
-  const apiUrl = process.env.API_URL || req.headers.host;
+  const apiUrl = process.env.API_URL || 'http://' + req.headers.host;
   // check if the request body is a buffer
 
   if (!Buffer.isBuffer(req.body)) {
