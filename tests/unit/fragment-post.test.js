@@ -64,14 +64,14 @@ describe('POST /v1/fragments', () => {
   });
 
   test('response includes a location header with full url', async () => {
-    const apiUrl = process.env.API_URL || 'http://localhost:8080';
+    const apiUrl = process.env.API_URL || 'localhost:8080';
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set('Content-Type', 'text/plain')
       .set('Host', apiUrl)
       .send(Buffer.from('test data'));
-    expect(res.header.location).toBe(`${apiUrl}/v1/fragments/${res.body.fragment.id}`);
+    expect(res.header.location).toBe(`http://${apiUrl}/v1/fragments/${res.body.fragment.id}`);
   });
 
   // Requests with unsupported media types should return a 415 status
