@@ -1,4 +1,5 @@
 const express = require('express');
+const { hostname } = require('os');
 
 // Our authentication middleware
 const { authenticate } = require('../auth');
@@ -31,6 +32,8 @@ router.get('/', (req, res) => {
       author,
       githubUrl: 'https://github.com/AliOmarTO/fragments',
       version,
+      // Include the hostname in the response
+      hostname: hostname(),
     })
   );
 });
