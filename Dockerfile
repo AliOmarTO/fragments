@@ -44,7 +44,8 @@ COPY src/ ./src/
 # Copy our HTPASSWD file
 COPY ./tests/.htpasswd ./tests/.htpasswd
 
-USER node
+# COmmented out since when using ecs we need root priveleges so it doesnt work with user node
+#USER node
 
 CMD ["node", "src/index.js"]
 
