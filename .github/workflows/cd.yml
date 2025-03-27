@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      
+
       # Use buildx, which is faster and can optimize the build steps
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,7 +69,7 @@ jobs:
           push: true
           # Use the git tag version and `latest`
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ env.VERSION_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:latest
-     
+
       # We need to update our fragment's Task Definition JSON
       # (i.e., fragments-definition.json) to use the newly
       # updated Docker Image to use (i.e., the tag we just pushed to ECR).
@@ -83,7 +83,7 @@ jobs:
           VERSION_TAG: ${{ github.ref_name }}
         with:
           task-definition: fragments-definition.json
-          container-name: fragments
+          container-name: fragments-container
           # Use the image we just built and pushed to ECR for this tag
           image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ env.VERSION_TAG }}
           # Add all the necessary environment variables, using GitHub Encrypted Secrets
@@ -96,7 +96,6 @@ jobs:
             AWS_COGNITO_POOL_ID=us-east-1_ueWvdobkD
             API_URL=http://fragments-lb-1435064608.us-east-1.elb.amazonaws.com
 
-            
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
@@ -104,5 +103,3 @@ jobs:
           cluster: fragments-cluster
           service: fragments-service
           wait-for-service-stability: true
-
-
