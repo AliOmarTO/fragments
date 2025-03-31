@@ -36,6 +36,10 @@
         {
           "name": "LOG_LEVEL",
           "value": "debug"
+        },
+        {
+          "name": "AWS_S3_BUCKET_NAME",
+          "value": "aomar46-fragments"
         }
       ],
       "environmentFiles": [],

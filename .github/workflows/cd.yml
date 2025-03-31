@@ -90,7 +90,7 @@ jobs:
           # for any values that should not be checked into git directly.  Here are
           # a few to get you started, but you should fill in the rest yourself.
           environment-variables: |
-            LOG_LEVEL=debug
+            LOG_LEVEL=info
             NODE_ENV=production
             AWS_COGNITO_CLIENT_ID=3a2n70i1fof8l03jaiplqcha0v
             AWS_COGNITO_POOL_ID=us-east-1_ueWvdobkD
