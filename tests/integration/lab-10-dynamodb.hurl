@@ -58,7 +58,8 @@ user1@email.com:password1
 HTTP/1.1 200
 [Asserts]
 jsonpath "$.status" == "ok"
-jsonpath "$.fragments" contains "{{fragment1-id}}", "{{fragment2-id}}"
+jsonpath "$.fragments" contains {{fragment1-id}}
+jsonpath "$.fragments" contains {{fragment2-id}}
 
 # DELETE the first fragment
 DELETE {{fragment1_url}}
