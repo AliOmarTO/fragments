@@ -16,7 +16,6 @@ module.exports = async (req, res) => {
 
     // Fragment exists, get its data
     const fragmentBuffer = await fragment.getData();
-    logger.debug(fragmentBuffer, 'Fragment exists for user');
 
     // If it's Markdown and user requests `.html`, convert it
     if (fragment.type === 'text/markdown' && ext === 'html') {

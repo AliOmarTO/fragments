@@ -21,6 +21,7 @@ const rawBody = () =>
       // will be equal to an empty Object `{}` and `Buffer.isBuffer(req.body) === false`
       const { type } = contentType.parse(req);
       logger.debug(type);
+      logger.debug(Fragment.isSupportedType(type), "checking if it's supported");
       return Fragment.isSupportedType(type);
     },
   });
