@@ -13,7 +13,7 @@ const supportedTypes = [
 ];
 
 describe('POST /v1/fragments', () => {
-  let createdImageFragmentIdPng;
+  //let createdImageFragmentIdPng;
 
   const pngPath = path.join(__dirname, '../integration/table.png'); // Path to your test image
 
@@ -52,8 +52,8 @@ describe('POST /v1/fragments', () => {
       .send(pngBuffer); // Send the PNG buffer
 
     expect(pngRes.statusCode).toBe(201); // Expect successful creation (201 status)
-    const pngBody = JSON.parse(pngRes.text); // Parse the response body
-    createdImageFragmentIdPng = pngBody.fragment.id; // Store the fragment ID
+    //const pngBody = JSON.parse(pngRes.text); // Parse the response body
+    //createdImageFragmentIdPng = pngBody.fragment.id; // Store the fragment ID
   });
 
   test.each(supportedTypes)('accepts supported content type: %s', async ({ type, data }) => {
