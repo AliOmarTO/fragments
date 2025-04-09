@@ -1,6 +1,8 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const hash = require('../../src/hash');
+const fs = require('fs').promises;
+const path = require('path');
 
 const supportedTypes = [
   { type: 'text/plain', data: 'Plain text data' },
@@ -11,6 +13,10 @@ const supportedTypes = [
 ];
 
 describe('POST /v1/fragments', () => {
+  let createdImageFragmentIdPng;
+
+  const pngPath = path.join(__dirname, '../integration/table.png'); // Path to your test image
+
   // If the request is missing the Authorization header, it should be forbidden
   test('unauthenticated requests are denied', () =>
     request(app).post('/v1/fragments').send(Buffer.from('test data')).expect(401));
@@ -33,6 +39,21 @@ describe('POST /v1/fragments', () => {
     expect(res.statusCode).toBe(201);
     expect(res.body.status).toBe('ok');
     expect(res.body.fragment).toBeDefined();
+  });
+
+  // Authenticated users can create a image fragment
+  test('authenticated users can create an image fragment', async () => {
+    const pngBuffer = await fs.readFile(pngPath); // Read the PNG image buffer
+
+    const pngRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'image/png')
+      .send(pngBuffer); // Send the PNG buffer
+
+    expect(pngRes.statusCode).toBe(201); // Expect successful creation (201 status)
+    const pngBody = JSON.parse(pngRes.text); // Parse the response body
+    createdImageFragmentIdPng = pngBody.fragment.id; // Store the fragment ID
   });
 
   test.each(supportedTypes)('accepts supported content type: %s', async ({ type, data }) => {
