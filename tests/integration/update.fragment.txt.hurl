@@ -1,4 +1,4 @@
-# DELETE request for a text fragment
+# PUT test for a text fragment
 POST http://localhost:8080/v1/fragments
 Content-Type: text/plain; charset=utf-8
 [BasicAuth]
@@ -16,23 +16,29 @@ jsonpath "$.fragment.ownerId" matches "^[0-9a-fA-F]+$"
 jsonpath "$.fragment.created" isString
 jsonpath "$.fragment.updated" isString
 jsonpath "$.fragment.type" == "text/plain"
+jsonpath "$.fragment.size" == 19
 [Captures]
 url: header "Location"
 
-# 2. Try to DELETE the fragment we just posted by its URL
-DELETE {{url}}
+# 2. Try to UPDATE the fragment we just posted by its URL
+PUT {{url}}
+Content-Type: text/plain
 [BasicAuth]
 user1@email.com:password1
+`Updated Fragment!`
 HTTP/1.1 200
 [Asserts]
 jsonpath "$.status" == "ok"
+jsonpath "$.fragment.size" == 17
+jsonpath "$.fragment.type" == "text/plain"
 
 # 3. Try to GET the fragment we just posted by its URL
 GET {{url}}
 [BasicAuth]
 user1@email.com:password1
+HTTP/1.1 200
+[Asserts]
+body == "Updated Fragment!"
 
-# 4. We expect to get back an HTTP 404 because it doesnt exist
-HTTP/1.1 404
 
 

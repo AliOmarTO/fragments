@@ -2,7 +2,7 @@ const request = require('supertest');
 
 const app = require('../../src/app');
 
-describe('GET /v1/fragments/:id ', () => {
+describe('DELETE /v1/fragments/:id ', () => {
   let createdFragmentId;
 
   test('unauthenticated requests are denied', () =>
@@ -13,7 +13,7 @@ describe('GET /v1/fragments/:id ', () => {
     expect(res.statusCode).toBe(404);
   });
 
-  // Test: Upload an image
+  // Test: Upload a fragment
   // Authenticated requests with valid data should create a new fragment
   test('authenticated users can create a plain text fragment', async () => {
     const res = await request(app)
@@ -28,7 +28,7 @@ describe('GET /v1/fragments/:id ', () => {
     createdFragmentId = res.body.fragment.id; // Store the created fragment ID
   });
 
-  // Test: Deleting the uploaded image fragment
+  // Test: Deleting the uploaded fragment
   test('should delete text fragment by ID', async () => {
     // Send DELETE request for the uploaded image fragment
     const res = await request(app)
