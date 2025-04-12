@@ -8,8 +8,6 @@ describe('GET /v1/fragments/:id ', () => {
   let fragmentID;
   let imageFragmentID;
 
-  beforeAll(async () => {});
-
   test('unauthenticated requests are denied', () =>
     request(app).get('/v1/fragments/1234').expect(401));
 
@@ -103,7 +101,6 @@ describe('GET /v1/fragments/:id ', () => {
 });
 
 describe('Fragment Conversion API Tests', () => {
-  const pngPath = path.join(__dirname, '../integration/table.png');
   const plainTextBuffer = Buffer.from('just some plain text');
   const mdBuffer = Buffer.from('# Hello Markdown');
   const htmlBuffer = Buffer.from('<p>Hello HTML</p>');
