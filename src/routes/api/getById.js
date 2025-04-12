@@ -4,10 +4,12 @@ const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
 const MarkdownIt = require('markdown-it');
 
+const yaml = require('js-yaml');
+const md = new MarkdownIt();
+const sharp = require('sharp');
+
 module.exports = async (req, res) => {
   logger.info('Retrieving fragment by id...');
-
-  const md = new MarkdownIt();
 
   try {
     const { id, ext } = req.params;
@@ -17,15 +19,41 @@ module.exports = async (req, res) => {
     // Fragment exists, get its data
     const fragmentBuffer = await fragment.getData();
 
-    // If it's Markdown and user requests `.html`, convert it
-    if (fragment.type === 'text/markdown' && ext === 'html') {
-      return res.type('text/html').send(md.render(fragmentBuffer.toString()));
+    if (ext) {
+      // handle image conversion
+      if (fragment.type.startsWith('image/')) {
+        const format = ext.toLowerCase();
+
+        const converted = await convertImage(fragmentBuffer, format);
+        return res.type(`image/${format}`).send(converted);
+      } else {
+        // Handle non-image fragments
+        const result = convertFragment(fragment.type, ext, fragmentBuffer);
+        return res.type(result.type).send(result.content);
+      }
     }
 
-    // Set the Content-Type header
+    //Set the Content-Type header
     res.set('content-type', fragment.type);
     res.send(new Buffer.from(fragmentBuffer));
   } catch (error) {
+    if (error.message.startsWith('Conversion from')) {
+      // Custom conversion error
+      return res.status(415).json(
+        createErrorResponse(415, {
+          message: 'Unsupported conversion requested',
+        })
+      );
+    }
+    if (error.message.startsWith('Image conversion')) {
+      // Custom conversion error
+      return res.status(415).json(
+        createErrorResponse(415, {
+          message: 'image conversion failed' + error,
+        })
+      );
+    }
+
     if (error.message === 'Fragment not found') {
       // Fragment does not exist
       logger.error(`Fragment not found: ${req.params.id}`);
@@ -35,7 +63,6 @@ module.exports = async (req, res) => {
         })
       );
     }
-    logger.error({ error }, 'Error retrieveing fragment');
 
     if (!res.headersSent) {
       return res.status(500).json(
@@ -46,3 +73,50 @@ module.exports = async (req, res) => {
     }
   }
 };
+
+async function convertImage(buffer, toFormat) {
+  try {
+    const convertedBuffer = await sharp(buffer).toFormat(toFormat).toBuffer();
+    return convertedBuffer;
+  } catch (err) {
+    throw new Error(`Image conversion to .${toFormat} failed: ${err.message}`);
+  }
+}
+
+function convertFragment(fragmentType, ext, buffer) {
+  const text = buffer.toString();
+
+  switch (fragmentType) {
+    case 'text/plain':
+      if (ext === 'txt') return { type: 'text/plain', content: text };
+      break;
+
+    case 'text/markdown':
+      if (ext === 'md' || ext === 'txt') return { type: 'text/plain', content: text };
+      if (ext === 'html') return { type: 'text/html', content: md.render(text) };
+      break;
+
+    case 'text/html':
+      if (ext === 'html') return { type: 'text/html', content: text };
+      if (ext === 'txt') return { type: 'text/plain', content: text };
+      break;
+
+    case 'text/csv':
+      if (ext === 'csv' || ext === 'txt') return { type: 'text/plain', content: text };
+      if (ext === 'json') return { type: 'application/json', content: JSON.stringify(text) };
+      break;
+
+    case 'application/json':
+      if (ext === 'json' || ext === 'txt') return { type: 'text/plain', content: text };
+      if (ext === 'yaml' || ext === 'yml')
+        return { type: 'application/yaml', content: yaml.dump(JSON.parse(text)) };
+      break;
+
+    case 'application/yaml':
+      if (ext === 'yaml') return { type: 'application/yaml', content: text };
+      if (ext === 'txt') return { type: 'text/plain', content: text };
+      break;
+  }
+
+  throw new Error(`Conversion from ${fragmentType} to .${ext} is not supported.`);
+}
