@@ -107,7 +107,8 @@ function convertFragment(fragmentType, ext, buffer) {
       break;
 
     case 'application/json':
-      if (ext === 'json' || ext === 'txt') return { type: 'text/plain', content: text };
+      if (ext === 'json') return { type: 'application/json', content: text };
+      if (ext === 'txt') return { type: 'text/plain', content: text };
       if (ext === 'yaml' || ext === 'yml')
         return { type: 'application/yaml', content: yaml.dump(JSON.parse(text)) };
       break;
